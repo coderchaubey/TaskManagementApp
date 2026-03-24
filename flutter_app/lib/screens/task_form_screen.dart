@@ -331,8 +331,12 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
   Widget _buildBlockedByDropdown() {
     final provider = context.read<TaskProvider>();
+    // Deduplicate by ID to prevent DropdownButton assertion error,
+    // and exclude the current task from its own "Blocked By" list
+    final seen = <int>{};
     final availableTasks = provider.tasks
         .where((t) => _isEditMode ? t.id != widget.taskId : true)
+        .where((t) => seen.add(t.id))
         .toList();
 
     return Container(
